@@ -2,11 +2,13 @@ var diceDom = document.querySelector(".dice");
 var activePlayer;
 var scores;
 var roundScore;
+var isNewGame;
 
 // Тоглоомыг эхлүүлье
 initGame();
 
 function initGame() {
+  isNewGame = true;
   scores = [0, 0];
   activePlayer = 0;
   roundScore = 0;
@@ -31,45 +33,56 @@ diceDom.style.display = "none";
 
 // Шоог шидэх эвэнт листенер
 document.querySelector(".btn-roll").addEventListener("click", function () {
-  // 1-6 хүртэл тоог санамсаргүйгээр гаргах
-  var diceNumber = Math.floor(Math.random() * 6 + 1);
+  if (isNewGame) {
+    // 1-6 хүртэл тоог санамсаргүйгээр гаргах
+    var diceNumber = Math.floor(Math.random() * 6 + 1);
 
-  // шооны зургийг вэб дээр гаргаж ирнэ.
-  diceDom.style.display = "block";
+    // шооны зургийг вэб дээр гаргаж ирнэ.
+    diceDom.style.display = "block";
 
-  // Буусан санамсаргүй тоонд харгалзах зургийг вэб дээр гаргаж ирнэ.
-  diceDom.src = "dice-" + diceNumber + ".png";
+    // Буусан санамсаргүй тоонд харгалзах зургийг вэб дээр гаргаж ирнэ.
+    diceDom.src = "dice-" + diceNumber + ".png";
 
-  // буусан тоо нь 1-ээс ялгаатай бол идэвхтэй тоглогчийн ээлжийн оноог нэмэгдүүлнэ.
+    // буусан тоо нь 1-ээс ялгаатай бол идэвхтэй тоглогчийн ээлжийн оноог нэмэгдүүлнэ.
 
-  if (diceNumber !== 1) {
-    // 1-ээс ялгаатай тоо буулаа.
-    roundScore = roundScore + diceNumber;
-    document.getElementById("current-" + activePlayer).textContent = roundScore;
+    if (diceNumber !== 1) {
+      // 1-ээс ялгаатай тоо буулаа.
+      roundScore = roundScore + diceNumber;
+      document.getElementById(
+        "current-" + activePlayer
+      ).textContent = roundScore;
+    } else {
+      // Хэрэв идэвхтэй тоглогч нь 0 байвал идэвхтэй тоглогчийг 1 болго.
+      switchToNextPlayer();
+    }
   } else {
-    // Хэрэв идэвхтэй тоглогч нь 0 байвал идэвхтэй тоглогчийг 1 болго.
-    switchToNextPlayer();
+    alert("Тоглоом дууссан байна. New game товчийг дарж шинээр эхлүүлнэ үү.");
   }
 });
 
 // hold товчны эвэнт
 document.querySelector(".btn-hold").addEventListener("click", function () {
-  scores[activePlayer] = scores[activePlayer] + roundScore;
+  if (isNewGame) {
+    scores[activePlayer] = scores[activePlayer] + roundScore;
 
-  document.getElementById("score-" + activePlayer).textContent =
-    scores[activePlayer];
-  // Уг тоглогчийг хожсон эсэхийг шалгах Оноо 100-аас их
-  if (scores[activePlayer] >= 10) {
-    // ялагч
-    document.getElementById("name-" + activePlayer).textContent = "ЯЛАГЧ!!!";
-    document
-      .querySelector(".player-" + activePlayer + "-panel")
-      .classList.add("winner");
-    document
-      .querySelector(".player-" + activePlayer + "-panel")
-      .classList.remove("active");
+    document.getElementById("score-" + activePlayer).textContent =
+      scores[activePlayer];
+    // Уг тоглогчийг хожсон эсэхийг шалгах Оноо 100-аас их
+    if (scores[activePlayer] >= 100) {
+      isNewGame = false;
+      // ялагч
+      document.getElementById("name-" + activePlayer).textContent = "ЯЛАГЧ!!!";
+      document
+        .querySelector(".player-" + activePlayer + "-panel")
+        .classList.add("winner");
+      document
+        .querySelector(".player-" + activePlayer + "-panel")
+        .classList.remove("active");
+    } else {
+      switchToNextPlayer();
+    }
   } else {
-    switchToNextPlayer();
+    alert("Тоглоом дууссан байна.");
   }
 });
 
